@@ -36,6 +36,8 @@ common common
 library
   import: common
   hs-source-dirs:      src
+  exposed-modules:
+    Control.Effect.Readline
   build-depends:
       base ^>= 4.12
     , fused-effects ^>= 1
