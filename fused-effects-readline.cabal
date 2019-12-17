@@ -45,6 +45,7 @@ library
     , haskeline ^>= 0.7
     , prettyprinter ^>= 1.5
     , prettyprinter-ansi-terminal ^>= 1.1
+    , terminal-size ^>= 0.3
     , transformers >= 0.4 && < 0.6
 
 test-suite test
