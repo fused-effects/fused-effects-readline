@@ -11,8 +11,8 @@ module Control.Effect.Readline
 ) where
 
 import Control.Algebra
-import Data.Text.Prettyprint.Doc
-import Data.Text.Prettyprint.Doc.Render.Terminal
+import Data.Text.Prettyprint.Doc (Doc)
+import Data.Text.Prettyprint.Doc.Render.Terminal (AnsiStyle)
 import GHC.Generics (Generic1)
 import Prelude hiding (print)
 
