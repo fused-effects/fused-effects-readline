@@ -1,3 +1,4 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Control.Carrier.Readline.Haskeline
 ( -- * Readline carrier
   ReadlineC(..)
@@ -8,6 +9,9 @@ module Control.Carrier.Readline.Haskeline
 import Control.Carrier.Lift
 import Control.Carrier.Reader
 import Control.Effect.Readline
+import Control.Monad.Fix (MonadFix)
+import Control.Monad.IO.Class (MonadIO)
 import System.Console.Haskeline
 
 newtype ReadlineC m a = ReadlineC (ReaderC Int (LiftC (InputT m)) a)
+  deriving (Applicative, Functor, Monad, MonadFix, MonadIO)
