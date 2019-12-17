@@ -37,7 +37,7 @@ library
   import: common
   hs-source-dirs:      src
   build-depends:
-      base ^>=4.12.0.0
+      base ^>= 4.12
 
 test-suite test
   import: common
@@ -45,4 +45,5 @@ test-suite test
   hs-source-dirs: test
   main-is:        Test.hs
   build-depends:
-      base ^>=4.12.0.0
+      base
+    , fused-effects-readline
