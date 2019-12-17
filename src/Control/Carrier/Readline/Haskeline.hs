@@ -1,2 +1,6 @@
 module Control.Carrier.Readline.Haskeline
-() where
+( -- * Readline effect
+  module Control.Effect.Readline
+) where
+
+import Control.Effect.Readline
