@@ -1,6 +1,11 @@
 {-# LANGUAGE DeriveFunctor, DeriveGeneric #-}
 module Control.Effect.Readline
-( Readline(..)
+( -- * Readline effect
+  Readline(..)
+  -- * Re-exports
+, Algebra
+, Has
+, run
 ) where
 
 import Control.Algebra
