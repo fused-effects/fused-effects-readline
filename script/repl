@@ -1,0 +1,13 @@
+#!/bin/bash
+# Usage: script/repl [ARGS...]
+# Run a repl session capable of loading all of the components. Any passed arguments, e.g. module names or flags, will be passed to ghci.
+
+set -e
+
+cd $(dirname "$0")/..
+
+repl_builddir=dist-repl
+
+cabal build --builddir="$repl_builddir" all --only-dependencies
+
+cabal exec --builddir="$repl_builddir" env -- -u GHC_ENVIRONMENT ghci -ghci-script=.ghci.fused-effects-readline $(script/ghci-flags --builddir "$repl_builddir") -no-ignore-dot-ghci $@
