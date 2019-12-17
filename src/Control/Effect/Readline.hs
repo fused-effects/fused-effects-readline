@@ -14,3 +14,4 @@ data Readline m k
   deriving (Functor, Generic1)
 
 instance HFunctor Readline
+instance Effect   Readline
