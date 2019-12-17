@@ -45,6 +45,7 @@ library
     , haskeline ^>= 0.7
     , prettyprinter ^>= 1.5
     , prettyprinter-ansi-terminal ^>= 1.1
+    , transformers >= 0.4 && < 0.6
 
 test-suite test
   import: common
