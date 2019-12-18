@@ -58,3 +58,8 @@ test-suite test
   build-depends:
       base
     , fused-effects-readline
+
+
+source-repository head
+  type:     git
+  location: https://github.com/fused-effects/fused-effects-readline
