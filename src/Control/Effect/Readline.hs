@@ -17,10 +17,10 @@ import Data.Kind (Type)
 import Prelude hiding (print)
 
 prompt :: Has Readline sig m => String -> m (Int, Maybe String)
-prompt p = send (Prompt p (curry pure))
+prompt p = send (Prompt p)
 
 print :: Has Readline sig m => Doc AnsiStyle -> m ()
-print s = send (Print s (pure ()))
+print s = send (Print s)
 
 
 data Readline (m :: Type -> Type) (k :: Type) where
