@@ -57,10 +57,11 @@ instance MonadException m => Algebra Readline (ReadlineC m) where
       local increment $ pure ((line, str) <$ ctx)
       where cyan = "\ESC[1;36m\STX"
             plain = "\ESC[0m\STX"
-    Print doc k -> do
+    Print doc -> do
       s <- maybe 80 Size.width <$> liftIO size
-      liftIO (renderIO stdout (layoutSmart defaultLayoutOptions { layoutPageWidth = AvailablePerLine s 0.8 } (doc <> line)))
-      k
+      let docstream = layoutSmart (layoutOptions s) (doc <> line)
+      (<$ ctx) <$> (liftIO . renderIO stdout $ docstream)
+      where layoutOptions s = defaultLayoutOptions { layoutPageWidth = AvailablePerLine s 0.8 }
 
 
 newtype Line = Line Int
