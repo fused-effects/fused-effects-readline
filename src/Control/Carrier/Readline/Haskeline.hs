@@ -43,7 +43,7 @@ runReadlineWithHistory block = do
 
   runReadline prefs settings block
 
-newtype ReadlineC m a = ReadlineC { runReadlineC :: ReaderC Line (LiftC (InputT m)) a }
+newtype ReadlineC m a = ReadlineC (ReaderC Line (LiftC (InputT m)) a)
   deriving (Applicative, Functor, Monad, MonadFix, MonadIO)
 
 instance MonadTrans ReadlineC where
