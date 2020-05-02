@@ -50,11 +50,11 @@ instance MonadTrans ReadlineC where
   lift = ReadlineC . lift . lift . lift
 
 instance MonadException m => Algebra Readline (ReadlineC m) where
-  alg = \case
-    Prompt prompt k -> ReadlineC $ do
+  alg _ sig ctx = case sig of
+    Prompt prompt -> ReadlineC $ do
       str <- sendM (getInputLine @m (cyan <> prompt <> plain))
       Line line <- ask
-      local increment (runReadlineC (k line str))
+      local increment $ pure ((line, str) <$ ctx)
       where cyan = "\ESC[1;36m\STX"
             plain = "\ESC[0m\STX"
     Print doc k -> do
