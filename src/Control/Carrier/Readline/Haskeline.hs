@@ -12,6 +12,7 @@ import Control.Algebra
 import Control.Carrier.Lift
 import Control.Carrier.Reader
 import Control.Effect.Readline
+import Control.Monad.Catch (MonadMask(..))
 import Control.Monad.Fix (MonadFix)
 import Control.Monad.IO.Class (MonadIO(..))
 import Control.Monad.Trans.Class (MonadTrans(..))
@@ -25,10 +26,10 @@ import System.Environment
 import System.FilePath
 import System.IO (stdout)
 
-runReadline :: MonadException m => Prefs -> Settings m -> ReadlineC m a -> m a
+runReadline :: (MonadIO m, MonadMask m) => Prefs -> Settings m -> ReadlineC m a -> m a
 runReadline prefs settings (ReadlineC m) = runInputTWithPrefs prefs (coerce settings) (runM (runReader (Line 0) m))
 
-runReadlineWithHistory :: MonadException m => ReadlineC m a -> m a
+runReadlineWithHistory :: (MonadIO m, MonadMask m) => ReadlineC m a -> m a
 runReadlineWithHistory block = do
   homeDir <- liftIO getHomeDirectory
   prefs   <- liftIO $ readPrefs (homeDir </> ".haskeline")
@@ -49,7 +50,7 @@ newtype ReadlineC m a = ReadlineC (ReaderC Line (LiftC (InputT m)) a)
 instance MonadTrans ReadlineC where
   lift = ReadlineC . lift . lift . lift
 
-instance MonadException m => Algebra Readline (ReadlineC m) where
+instance (MonadIO m, MonadMask m) => Algebra Readline (ReadlineC m) where
   alg _ sig ctx = case sig of
     Prompt prompt -> ReadlineC $ do
       str <- sendM (getInputLine @m (cyan <> prompt <> plain))
