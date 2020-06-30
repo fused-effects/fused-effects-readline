@@ -16,7 +16,6 @@ import Control.Monad.Catch (MonadMask(..))
 import Control.Monad.Fix (MonadFix)
 import Control.Monad.IO.Class (MonadIO(..))
 import Control.Monad.Trans.Class (MonadTrans(..))
-import Data.Coerce (coerce)
 import Data.Text.Prettyprint.Doc
 import Data.Text.Prettyprint.Doc.Render.Terminal
 import System.Console.Haskeline
@@ -27,7 +26,7 @@ import System.FilePath
 import System.IO (stdout)
 
 runReadline :: (MonadIO m, MonadMask m) => Prefs -> Settings m -> ReadlineC m a -> m a
-runReadline prefs settings (ReadlineC m) = runInputTWithPrefs prefs (coerce settings) (runM (runReader (Line 0) m))
+runReadline prefs settings (ReadlineC m) = runInputTWithPrefs prefs settings (runM (runReader (Line 0) m))
 
 runReadlineWithHistory :: (MonadIO m, MonadMask m) => ReadlineC m a -> m a
 runReadlineWithHistory block = do
