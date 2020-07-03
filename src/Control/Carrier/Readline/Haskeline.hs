@@ -34,14 +34,14 @@ import System.IO (stdout)
 #if MIN_VERSION_haskeline(0, 8, 0)
 runReadline :: (MonadIO m, MonadMask m) => Prefs -> Settings m -> ReadlineC m a -> m a
 #else
-runReadline :: (MonadIO m, MonadMask m, MonadException m) => Prefs -> Settings m -> ReadlineC m a -> m a
+runReadline :: MonadException m => Prefs -> Settings m -> ReadlineC m a -> m a
 #endif
 runReadline prefs settings (ReadlineC m) = runInputTWithPrefs prefs settings (runM (runReader (Line 0) m))
 
 #if MIN_VERSION_haskeline(0, 8, 0)
 runReadlineWithHistory :: (MonadIO m, MonadMask m) => ReadlineC m a -> m a
 #else
-runReadlineWithHistory :: (MonadIO m, MonadMask m, MonadException m) => ReadlineC m a -> m a
+runReadlineWithHistory :: MonadException m => ReadlineC m a -> m a
 #endif
 runReadlineWithHistory block = do
   homeDir <- liftIO getHomeDirectory
@@ -66,7 +66,7 @@ instance MonadTrans ReadlineC where
 #if MIN_VERSION_haskeline(0, 8, 0)
 instance (MonadIO m, MonadMask m) => Algebra Readline (ReadlineC m) where
 #else
-instance (MonadException m, MonadIO m, MonadMask m) => Algebra Readline (ReadlineC m) where
+instance MonadException m => Algebra Readline (ReadlineC m) where
 #endif
   alg _ sig ctx = case sig of
     Prompt prompt -> ReadlineC $ do
