@@ -13,6 +13,7 @@ maintainer:          rob.rix@me.com
 copyright:           2019 Rob Rix
 category:            Development
 extra-source-files:
+  README.md
   CHANGELOG.md
 
 tested-with:
