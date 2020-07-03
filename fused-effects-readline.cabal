@@ -44,7 +44,7 @@ library
     Control.Carrier.Readline.Haskeline
     Control.Effect.Readline
   build-depends:
-      base >= 4.12 && < 5
+    , base >= 4.12 && < 5
     , directory ^>= 1.3.3.2
     , exceptions ^>= 0.10
     , filepath ^>= 1.4.2.1
