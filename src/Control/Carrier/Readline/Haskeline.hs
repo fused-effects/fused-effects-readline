@@ -18,7 +18,9 @@ import Control.Algebra
 import Control.Carrier.Lift
 import Control.Carrier.Reader
 import Control.Effect.Readline
+#if MIN_VERSION_haskeline(0, 8, 0)
 import Control.Monad.Catch (MonadMask(..))
+#endif
 import Control.Monad.Fix (MonadFix)
 import Control.Monad.IO.Class (MonadIO(..))
 import Control.Monad.Trans.Class (MonadTrans(..))
