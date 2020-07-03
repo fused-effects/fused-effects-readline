@@ -1,4 +1,7 @@
-{-# LANGUAGE DeriveFunctor, DeriveGeneric, GADTs, KindSignatures #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE KindSignatures #-}
 module Control.Effect.Readline
 ( -- * Readline effect
   Readline(..)
@@ -11,9 +14,9 @@ module Control.Effect.Readline
 ) where
 
 import Control.Algebra
+import Data.Kind (Type)
 import Data.Text.Prettyprint.Doc (Doc)
 import Data.Text.Prettyprint.Doc.Render.Terminal (AnsiStyle)
-import Data.Kind (Type)
 import Prelude hiding (print)
 
 prompt :: Has Readline sig m => String -> m (Int, Maybe String)
