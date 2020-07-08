@@ -1,0 +1,4 @@
+packages: .
+
+package fused-effects-readline
+  ghc-options: -Werror
