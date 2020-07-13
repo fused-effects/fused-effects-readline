@@ -10,7 +10,7 @@ license:             BSD-3-Clause
 license-file:        LICENSE
 author:              Rob Rix
 maintainer:          rob.rix@me.com
-copyright:           2019 Rob Rix
+copyright:           2019-2020 Rob Rix
 category:            Development
 extra-source-files:
   README.md
