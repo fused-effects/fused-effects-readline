@@ -1,7 +1,7 @@
 cabal-version:       2.2
 
 name:                fused-effects-readline
-version:             0.0.0.0
+version:             0.1.0.0
 synopsis:            A readline-like effect and carrier for fused-effects
 description:         A readline-like effect and carrier for fused-effects, using haskeline under the hood
 homepage:            https://github.com/fused-effects/fused-effects-readline
