@@ -1,3 +1,6 @@
+- Support for `prettyprinter` 1.7.
+
+
 # v0.1.0.0
 
 - Support for `ghc` 8.10.
