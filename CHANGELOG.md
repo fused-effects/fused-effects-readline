@@ -2,6 +2,8 @@
 
 - Removes the styling applied to prompts; users can add styling to the prompt for themselves if so desired.
 
+- Removes line number tracking.
+
 - Renames `prompt` to `getInputLine`, matching `haskeline`’s naming.
 
 - Defines `getInputLineWithInitial`, `getInputChar`, `getPassword`, etc. operations matching `haskeline`’s API.

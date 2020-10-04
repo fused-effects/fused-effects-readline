@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP #-}
-{-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
 module Control.Carrier.Readline.Haskeline
@@ -13,9 +13,7 @@ module Control.Carrier.Readline.Haskeline
 ) where
 
 import Control.Algebra
-import Control.Carrier.State.Strict
 import Control.Effect.Readline
-import Control.Monad (when)
 #if MIN_VERSION_haskeline(0, 8, 0)
 import Control.Monad.Catch (MonadMask(..))
 #endif
@@ -36,7 +34,7 @@ runReadline :: (MonadIO m, MonadMask m) => Prefs -> Settings m -> ReadlineC m a 
 #else
 runReadline :: MonadException m => Prefs -> Settings m -> ReadlineC m a -> m a
 #endif
-runReadline prefs settings (ReadlineC m) = runInputTWithPrefs prefs settings (snd <$> m 0)
+runReadline prefs settings (ReadlineC m) = runInputTWithPrefs prefs settings m
 
 #if MIN_VERSION_haskeline(0, 8, 0)
 runReadlineWithHistory :: (MonadIO m, MonadMask m) => ReadlineC m a -> m a
@@ -59,11 +57,8 @@ runReadlineWithHistory block = do
 
   runReadline prefs settings block
 
-newtype ReadlineC m a = ReadlineC (Int -> InputT m (Int, a))
-  deriving (Applicative, Functor, Monad, MonadFix, MonadIO) via StateC Int (InputT m)
-
-instance MonadTrans ReadlineC where
-  lift m = ReadlineC $ \ l -> (,) l <$> lift m
+newtype ReadlineC m a = ReadlineC (InputT m a)
+  deriving (Applicative, Functor, Monad, MonadFix, MonadIO, MonadTrans)
 
 #if MIN_VERSION_haskeline(0, 8, 0)
 instance (MonadIO m, MonadMask m) => Algebra Readline (ReadlineC m) where
@@ -71,13 +66,11 @@ instance (MonadIO m, MonadMask m) => Algebra Readline (ReadlineC m) where
 instance MonadException m => Algebra Readline (ReadlineC m) where
 #endif
   alg _ sig ctx = (<$ ctx) <$> case sig of
-    GetInputLine prompt -> liftInputT (H.getInputLine prompt) <* incrLine
-    GetInputLineWithInitial prompt lr -> liftInputT (H.getInputLineWithInitial prompt lr) <* incrLine
-    GetInputChar prompt -> do
-      c <- liftInputT (H.getInputChar prompt)
-      c <$ when (c == Just '\n') incrLine
-    GetPassword c prompt -> liftInputT (H.getPassword c prompt) <* incrLine
-    WaitForAnyKey prompt -> liftInputT (H.waitForAnyKey prompt)
+    GetInputLine prompt -> ReadlineC (H.getInputLine prompt)
+    GetInputLineWithInitial prompt lr -> ReadlineC (H.getInputLineWithInitial prompt lr)
+    GetInputChar prompt -> ReadlineC (H.getInputChar prompt)
+    GetPassword c prompt -> ReadlineC (H.getPassword c prompt)
+    WaitForAnyKey prompt -> ReadlineC (H.waitForAnyKey prompt)
     Print doc -> liftIO $ do
       opts <- layoutOptionsForTerminal
       renderIO stdout (layoutSmart opts (doc <> line))
@@ -86,9 +79,3 @@ layoutOptionsForTerminal :: IO LayoutOptions
 layoutOptionsForTerminal = do
   s <- maybe 80 Size.width <$> size
   pure defaultLayoutOptions { layoutPageWidth = AvailablePerLine s 0.8 }
-
-liftInputT :: Functor m => InputT m a -> ReadlineC m a
-liftInputT m = ReadlineC $ \ l -> (,) l <$> m
-
-incrLine :: Applicative m => ReadlineC m ()
-incrLine = ReadlineC $ \ line -> pure (line + 1, ())
