@@ -1,5 +1,4 @@
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE KindSignatures #-}
 module Control.Effect.Readline
 ( -- * Readline effect
   Readline(..)
@@ -19,7 +18,6 @@ module Control.Effect.Readline
 ) where
 
 import Control.Algebra
-import Data.Kind (Type)
 import Data.Text.Prettyprint.Doc (Doc)
 import Data.Text.Prettyprint.Doc.Render.Terminal (AnsiStyle)
 import Prelude hiding (print)
@@ -52,7 +50,7 @@ print :: Has Readline sig m => Doc AnsiStyle -> m ()
 print s = send (Print s)
 
 
-data Readline (m :: Type -> Type) (k :: Type) where
+data Readline m k where
   GetInputLine :: String -> Readline m (Maybe String)
   GetInputLineWithInitial :: String -> (String, String) -> Readline m (Maybe String)
   GetInputChar :: String -> Readline m (Maybe Char)
