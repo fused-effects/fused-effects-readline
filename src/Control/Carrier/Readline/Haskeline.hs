@@ -74,14 +74,11 @@ instance MonadException m => Algebra Readline (ReadlineC m) where
 #endif
   alg _ sig ctx = case sig of
     Prompt prompt -> ReadlineC $ \ line -> do
-      str <- getInputLine @m (cyan <> prompt <> plain)
+      str <- getInputLine @m prompt
       pure (line + 1, ((line, str) <$ ctx))
     Print doc -> liftIO $ do
       opts <- layoutOptionsForTerminal
       (<$ ctx) <$> renderIO stdout (layoutSmart opts (doc <> line))
-    where
-    cyan = "\ESC[1;36m\STX"
-    plain = "\ESC[0m\STX"
 
 layoutOptionsForTerminal :: IO LayoutOptions
 layoutOptionsForTerminal = do
