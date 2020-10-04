@@ -52,8 +52,8 @@ runReadlineWithHistory block = do
     prog    <- getExecutablePath
     let settingsDir = homeDir </> ".local" </> dropExtension (takeFileName prog)
         settings = Settings
-          { complete = noCompletion
-          , historyFile = Just (settingsDir </> "repl_history")
+          { complete       = noCompletion
+          , historyFile    = Just (settingsDir </> "repl_history")
           , autoAddHistory = True
           }
     createDirectoryIfMissing True settingsDir
