@@ -2,8 +2,6 @@
 {-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
 module Control.Carrier.Readline.Haskeline
 ( -- * Readline carrier
@@ -73,19 +71,19 @@ instance MonadException m => Algebra Readline (ReadlineC m) where
 #endif
   alg _ sig ctx = case sig of
     GetInputLine prompt -> ReadlineC $ \ line -> do
-      str <- H.getInputLine @m prompt
+      str <- H.getInputLine prompt
       pure (line + 1, (str <$ ctx))
     GetInputLineWithInitial prompt lr -> ReadlineC $ \ line -> do
-      str <- H.getInputLineWithInitial @m prompt lr
+      str <- H.getInputLineWithInitial prompt lr
       pure (line + 1, (str <$ ctx))
     GetInputChar prompt -> ReadlineC $ \ line -> do
-      chr <- H.getInputChar @m prompt
+      chr <- H.getInputChar prompt
       pure (line + if chr == Just '\n' then 1 else 0, (chr <$ ctx))
     GetPassword c prompt -> ReadlineC $ \ line -> do
-      str <- H.getPassword @m c prompt
+      str <- H.getPassword c prompt
       pure (line + 1, (str <$ ctx))
     WaitForAnyKey prompt -> ReadlineC $ \ line -> do
-      b <- H.waitForAnyKey @m prompt
+      b <- H.waitForAnyKey prompt
       pure (line, (b <$ ctx))
     Print doc -> liftIO $ do
       opts <- layoutOptionsForTerminal
