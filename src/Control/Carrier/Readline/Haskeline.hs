@@ -77,9 +77,13 @@ instance MonadException m => Algebra Readline (ReadlineC m) where
       str <- getInputLine @m (cyan <> prompt <> plain)
       pure (line + 1, ((line, str) <$ ctx))
     Print doc -> liftIO $ do
-      s <- maybe 80 Size.width <$> size
-      (<$ ctx) <$> renderIO stdout (layoutSmart (layoutOptions s) (doc <> line))
+      opts <- layoutOptions
+      (<$ ctx) <$> renderIO stdout (layoutSmart opts (doc <> line))
     where
     cyan = "\ESC[1;36m\STX"
     plain = "\ESC[0m\STX"
-    layoutOptions s = defaultLayoutOptions { layoutPageWidth = AvailablePerLine s 0.8 }
+
+layoutOptions :: IO LayoutOptions
+layoutOptions = do
+  s <- maybe 80 Size.width <$> size
+  pure defaultLayoutOptions { layoutPageWidth = AvailablePerLine s 0.8 }
