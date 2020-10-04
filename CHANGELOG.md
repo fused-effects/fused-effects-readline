@@ -4,6 +4,8 @@
 
 - Renames `prompt` to `getInputLine`, matching `haskeline`’s naming.
 
+- Defines a `getInputLineWithInitial` operation.
+
 
 # v0.1.0.1
 
