@@ -76,10 +76,10 @@ instance MonadException m => Algebra Readline (ReadlineC m) where
     Prompt prompt -> ReadlineC $ \ line -> do
       str <- getInputLine @m (cyan <> prompt <> plain)
       pure (line + 1, ((line, str) <$ ctx))
-    Print doc -> do
-      s <- maybe 80 Size.width <$> liftIO size
+    Print doc -> liftIO $ do
+      s <- maybe 80 Size.width <$> size
       let docstream = layoutSmart (layoutOptions s) (doc <> line)
-      (<$ ctx) <$> liftIO (renderIO stdout docstream)
+      (<$ ctx) <$> renderIO stdout docstream
     where
     cyan = "\ESC[1;36m\STX"
     plain = "\ESC[0m\STX"
