@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
@@ -38,7 +38,7 @@ runReadline :: (MonadIO m, MonadMask m) => Prefs -> Settings m -> ReadlineC m a 
 #else
 runReadline :: MonadException m => Prefs -> Settings m -> ReadlineC m a -> m a
 #endif
-runReadline prefs settings (ReadlineC m) = runInputTWithPrefs prefs settings (runM (evalState 0 m))
+runReadline prefs settings (ReadlineC m) = runInputTWithPrefs prefs settings (snd <$> m 0)
 
 #if MIN_VERSION_haskeline(0, 8, 0)
 runReadlineWithHistory :: (MonadIO m, MonadMask m) => ReadlineC m a -> m a
@@ -61,11 +61,11 @@ runReadlineWithHistory block = do
 
   runReadline prefs settings block
 
-newtype ReadlineC m a = ReadlineC (StateC Int (LiftC (InputT m)) a)
-  deriving (Applicative, Functor, Monad, MonadFix, MonadIO)
+newtype ReadlineC m a = ReadlineC (Int -> InputT m (Int, a))
+  deriving (Applicative, Functor, Monad, MonadFix, MonadIO) via StateC Int (LiftC (InputT m))
 
 instance MonadTrans ReadlineC where
-  lift = ReadlineC . lift . lift . lift
+  lift m = ReadlineC $ \ l -> (,) l <$> lift m
 
 #if MIN_VERSION_haskeline(0, 8, 0)
 instance (MonadIO m, MonadMask m) => Algebra Readline (ReadlineC m) where
@@ -73,11 +73,9 @@ instance (MonadIO m, MonadMask m) => Algebra Readline (ReadlineC m) where
 instance MonadException m => Algebra Readline (ReadlineC m) where
 #endif
   alg _ sig ctx = case sig of
-    Prompt prompt -> ReadlineC $ do
-      str <- sendM (getInputLine @m (cyan <> prompt <> plain))
-      line <- get
-      put (line + 1)
-      pure ((line, str) <$ ctx)
+    Prompt prompt -> ReadlineC $ \ line -> do
+      str <- getInputLine @m (cyan <> prompt <> plain)
+      pure (line + 1, ((line, str) <$ ctx))
       where cyan = "\ESC[1;36m\STX"
             plain = "\ESC[0m\STX"
     Print doc -> do
