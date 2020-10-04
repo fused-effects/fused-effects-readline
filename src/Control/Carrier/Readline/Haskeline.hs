@@ -93,3 +93,6 @@ layoutOptionsForTerminal :: IO LayoutOptions
 layoutOptionsForTerminal = do
   s <- maybe 80 Size.width <$> size
   pure defaultLayoutOptions { layoutPageWidth = AvailablePerLine s 0.8 }
+
+liftInputT :: Functor m => InputT m a -> ReadlineC m a
+liftInputT m = ReadlineC $ \ l -> (,) l <$> m
