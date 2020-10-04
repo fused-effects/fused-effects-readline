@@ -4,9 +4,7 @@
 
 - Renames `prompt` to `getInputLine`, matching `haskeline`’s naming.
 
-- Defines a `getInputLineWithInitial` operation.
-
-- Defines a `getInputChar` operation.
+- Defines `getInputLineWithInitial`, `getInputChar`, `getPassword`, etc. operations matching `haskeline`’s API.
 
 
 # v0.1.0.1
