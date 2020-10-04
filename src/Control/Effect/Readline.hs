@@ -7,6 +7,7 @@ module Control.Effect.Readline
 , getInputLineWithInitial
 , getInputChar
 , getPassword
+, waitForAnyKey
 , print
   -- * Re-exports
 , Algebra
@@ -32,6 +33,9 @@ getInputChar p = send (GetInputChar p)
 getPassword :: Has Readline sig m => Maybe Char -> String -> m (Maybe String)
 getPassword c s = send (GetPassword c s)
 
+waitForAnyKey :: Has Readline sig m => String -> m Bool
+waitForAnyKey p = send (WaitForAnyKey p)
+
 print :: Has Readline sig m => Doc AnsiStyle -> m ()
 print s = send (Print s)
 
@@ -41,4 +45,5 @@ data Readline (m :: Type -> Type) (k :: Type) where
   GetInputLineWithInitial :: String -> (String, String) -> Readline m (Maybe String)
   GetInputChar :: String -> Readline m (Maybe Char)
   GetPassword :: Maybe Char -> String -> Readline m (Maybe String)
+  WaitForAnyKey :: String -> Readline m Bool
   Print :: Doc AnsiStyle -> Readline m ()

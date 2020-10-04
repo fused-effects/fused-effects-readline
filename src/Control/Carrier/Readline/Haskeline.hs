@@ -84,6 +84,9 @@ instance MonadException m => Algebra Readline (ReadlineC m) where
     GetPassword c prompt -> ReadlineC $ \ line -> do
       str <- H.getPassword @m c prompt
       pure (line + 1, (str <$ ctx))
+    WaitForAnyKey prompt -> ReadlineC $ \ line -> do
+      b <- H.waitForAnyKey @m prompt
+      pure (line, (b <$ ctx))
     Print doc -> liftIO $ do
       opts <- layoutOptionsForTerminal
       (<$ ctx) <$> renderIO stdout (layoutSmart opts (doc <> line))
