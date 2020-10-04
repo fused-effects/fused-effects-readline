@@ -38,7 +38,7 @@ runReadline :: (MonadIO m, MonadMask m) => Prefs -> Settings m -> ReadlineC m a 
 #else
 runReadline :: MonadException m => Prefs -> Settings m -> ReadlineC m a -> m a
 #endif
-runReadline prefs settings (ReadlineC m) = runInputTWithPrefs prefs settings (runM (runReader (Line 0) m))
+runReadline prefs settings (ReadlineC m) = runInputTWithPrefs prefs settings (runM (runReader 0 m))
 
 #if MIN_VERSION_haskeline(0, 8, 0)
 runReadlineWithHistory :: (MonadIO m, MonadMask m) => ReadlineC m a -> m a
@@ -61,7 +61,7 @@ runReadlineWithHistory block = do
 
   runReadline prefs settings block
 
-newtype ReadlineC m a = ReadlineC (ReaderC Line (LiftC (InputT m)) a)
+newtype ReadlineC m a = ReadlineC (ReaderC Int (LiftC (InputT m)) a)
   deriving (Applicative, Functor, Monad, MonadFix, MonadIO)
 
 instance MonadTrans ReadlineC where
@@ -75,7 +75,7 @@ instance MonadException m => Algebra Readline (ReadlineC m) where
   alg _ sig ctx = case sig of
     Prompt prompt -> ReadlineC $ do
       str <- sendM (getInputLine @m (cyan <> prompt <> plain))
-      Line line <- ask
+      line <- ask
       local increment $ pure ((line, str) <$ ctx)
       where cyan = "\ESC[1;36m\STX"
             plain = "\ESC[0m\STX"
@@ -86,7 +86,5 @@ instance MonadException m => Algebra Readline (ReadlineC m) where
       where layoutOptions s = defaultLayoutOptions { layoutPageWidth = AvailablePerLine s 0.8 }
 
 
-newtype Line = Line Int
-
-increment :: Line -> Line
-increment (Line n) = Line (n + 1)
+increment :: Int -> Int
+increment n = n + 1
