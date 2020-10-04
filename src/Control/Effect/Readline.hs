@@ -5,6 +5,7 @@ module Control.Effect.Readline
   Readline(..)
 , getInputLine
 , getInputLineWithInitial
+, getInputChar
 , print
   -- * Re-exports
 , Algebra
@@ -24,6 +25,9 @@ getInputLine p = send (GetInputLine p)
 getInputLineWithInitial :: Has Readline sig m => String -> (String, String) -> m (Maybe String)
 getInputLineWithInitial p lr = send (GetInputLineWithInitial p lr)
 
+getInputChar :: Has Readline sig m => String -> m (Maybe Char)
+getInputChar p = send (GetInputChar p)
+
 print :: Has Readline sig m => Doc AnsiStyle -> m ()
 print s = send (Print s)
 
@@ -31,4 +35,5 @@ print s = send (Print s)
 data Readline (m :: Type -> Type) (k :: Type) where
   GetInputLine :: String -> Readline m (Maybe String)
   GetInputLineWithInitial :: String -> (String, String) -> Readline m (Maybe String)
+  GetInputChar :: String -> Readline m (Maybe Char)
   Print :: Doc AnsiStyle -> Readline m ()
