@@ -4,6 +4,8 @@
 
 - Removes line number tracking.
 
+- Removes `print` in favour of `outputStr` & `outputStrLn`.
+
 - Renames `prompt` to `getInputLine`, matching `haskeline`’s naming.
 
 - Defines `getInputLineWithInitial`, `getInputChar`, `getPassword`, etc. operations matching `haskeline`’s API.
