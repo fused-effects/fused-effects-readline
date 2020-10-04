@@ -46,16 +46,18 @@ runReadlineWithHistory :: (MonadIO m, MonadMask m) => ReadlineC m a -> m a
 runReadlineWithHistory :: MonadException m => ReadlineC m a -> m a
 #endif
 runReadlineWithHistory block = do
-  homeDir <- liftIO getHomeDirectory
-  prefs   <- liftIO $ readPrefs (homeDir </> ".haskeline")
-  prog    <- liftIO getExecutablePath
-  let settingsDir = homeDir </> ".local" </> dropExtension (takeFileName prog)
-      settings = Settings
-        { complete = noCompletion
-        , historyFile = Just (settingsDir </> "repl_history")
-        , autoAddHistory = True
-        }
-  liftIO $ createDirectoryIfMissing True settingsDir
+  (prefs, settings) <- liftIO $ do
+    homeDir <- getHomeDirectory
+    prefs   <- readPrefs (homeDir </> ".haskeline")
+    prog    <- getExecutablePath
+    let settingsDir = homeDir </> ".local" </> dropExtension (takeFileName prog)
+        settings = Settings
+          { complete = noCompletion
+          , historyFile = Just (settingsDir </> "repl_history")
+          , autoAddHistory = True
+          }
+    createDirectoryIfMissing True settingsDir
+    pure (prefs, settings)
 
   runReadline prefs settings block
 
