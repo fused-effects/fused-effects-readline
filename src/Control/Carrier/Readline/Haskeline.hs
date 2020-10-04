@@ -70,17 +70,17 @@ instance (MonadIO m, MonadMask m) => Algebra Readline (ReadlineC m) where
 #else
 instance MonadException m => Algebra Readline (ReadlineC m) where
 #endif
-  alg _ sig ctx = case sig of
-    GetInputLine prompt -> (<$ ctx) <$> liftInputT (H.getInputLine prompt) <* incrLine
-    GetInputLineWithInitial prompt lr -> (<$ ctx) <$> liftInputT (H.getInputLineWithInitial prompt lr) <* incrLine
-    GetInputChar prompt -> (<$ ctx) <$> do
+  alg _ sig ctx = (<$ ctx) <$> case sig of
+    GetInputLine prompt -> liftInputT (H.getInputLine prompt) <* incrLine
+    GetInputLineWithInitial prompt lr -> liftInputT (H.getInputLineWithInitial prompt lr) <* incrLine
+    GetInputChar prompt -> do
       c <- liftInputT (H.getInputChar prompt)
       c <$ when (c == Just '\n') incrLine
-    GetPassword c prompt -> (<$ ctx) <$> liftInputT (H.getPassword c prompt) <* incrLine
-    WaitForAnyKey prompt -> (<$ ctx) <$> liftInputT (H.waitForAnyKey prompt)
+    GetPassword c prompt -> liftInputT (H.getPassword c prompt) <* incrLine
+    WaitForAnyKey prompt -> liftInputT (H.waitForAnyKey prompt)
     Print doc -> liftIO $ do
       opts <- layoutOptionsForTerminal
-      (<$ ctx) <$> renderIO stdout (layoutSmart opts (doc <> line))
+      renderIO stdout (layoutSmart opts (doc <> line))
 
 layoutOptionsForTerminal :: IO LayoutOptions
 layoutOptionsForTerminal = do
