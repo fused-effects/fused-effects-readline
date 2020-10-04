@@ -10,6 +10,7 @@ module Control.Effect.Readline
 , outputStr
 , outputStrLn
 , withInterrupt
+, handleInterrupt
   -- * Re-exports
 , Algebra
 , Has
@@ -42,6 +43,9 @@ outputStrLn s = outputStr (s <> "\n")
 withInterrupt :: Has Readline sig m => m a -> m a
 withInterrupt m = send (WithInterrupt m)
 
+handleInterrupt :: Has Readline sig m => m a -> m a -> m a
+handleInterrupt h m = send (HandleInterrupt h m)
+
 data Readline m k where
   GetInputLine :: String -> Readline m (Maybe String)
   GetInputLineWithInitial :: String -> (String, String) -> Readline m (Maybe String)
@@ -50,3 +54,4 @@ data Readline m k where
   WaitForAnyKey :: String -> Readline m Bool
   OutputStr :: String -> Readline m ()
   WithInterrupt :: m a -> Readline m a
+  HandleInterrupt :: m a -> m a -> Readline m a

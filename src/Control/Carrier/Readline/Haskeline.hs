@@ -69,3 +69,4 @@ instance MonadException m => Algebra Readline (ReadlineC m) where
     WaitForAnyKey prompt -> (<$ ctx) <$> ReadlineC (H.waitForAnyKey prompt)
     OutputStr s -> (<$ ctx) <$> ReadlineC (H.outputStr s)
     WithInterrupt m -> ReadlineC (H.withInterrupt (runReadlineC (hdl (m <$ ctx))))
+    HandleInterrupt h m -> ReadlineC (H.handleInterrupt (runReadlineC (hdl (h <$ ctx))) (runReadlineC (hdl (m <$ ctx))))
