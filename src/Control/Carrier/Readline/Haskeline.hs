@@ -57,7 +57,7 @@ runReadlineWithHistory block = do
 
   runReadline prefs settings block
 
-newtype ReadlineC m a = ReadlineC (InputT m a)
+newtype ReadlineC m a = ReadlineC { runReadlineC :: InputT m a }
   deriving (Applicative, Functor, Monad, MonadFix, MonadIO, MonadTrans)
 
 #if MIN_VERSION_haskeline(0, 8, 0)
@@ -65,14 +65,15 @@ instance (MonadIO m, MonadMask m) => Algebra Readline (ReadlineC m) where
 #else
 instance MonadException m => Algebra Readline (ReadlineC m) where
 #endif
-  alg _ sig ctx = (<$ ctx) <$> case sig of
-    GetInputLine prompt -> ReadlineC (H.getInputLine prompt)
-    GetInputLineWithInitial prompt lr -> ReadlineC (H.getInputLineWithInitial prompt lr)
-    GetInputChar prompt -> ReadlineC (H.getInputChar prompt)
-    GetPassword c prompt -> ReadlineC (H.getPassword c prompt)
-    WaitForAnyKey prompt -> ReadlineC (H.waitForAnyKey prompt)
-    OutputStr s -> ReadlineC (H.outputStr s)
-    Print doc -> liftIO $ do
+  alg hdl sig ctx = case sig of
+    GetInputLine prompt -> (<$ ctx) <$> ReadlineC (H.getInputLine prompt)
+    GetInputLineWithInitial prompt lr -> (<$ ctx) <$> ReadlineC (H.getInputLineWithInitial prompt lr)
+    GetInputChar prompt -> (<$ ctx) <$> ReadlineC (H.getInputChar prompt)
+    GetPassword c prompt -> (<$ ctx) <$> ReadlineC (H.getPassword c prompt)
+    WaitForAnyKey prompt -> (<$ ctx) <$> ReadlineC (H.waitForAnyKey prompt)
+    OutputStr s -> (<$ ctx) <$> ReadlineC (H.outputStr s)
+    WithInterrupt m -> ReadlineC (H.withInterrupt (runReadlineC (hdl (m <$ ctx))))
+    Print doc -> liftIO $ (<$ ctx) <$> do
       opts <- layoutOptionsForTerminal
       renderIO stdout (layoutSmart opts (doc <> line))
 

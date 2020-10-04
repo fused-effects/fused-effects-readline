@@ -10,6 +10,7 @@ module Control.Effect.Readline
 , waitForAnyKey
 , outputStr
 , outputStrLn
+, withInterrupt
 , print
   -- * Re-exports
 , Algebra
@@ -44,6 +45,9 @@ outputStr s = send (OutputStr s)
 outputStrLn :: Has Readline sig m => String -> m ()
 outputStrLn s = outputStr (s <> "\n")
 
+withInterrupt :: Has Readline sig m => m a -> m a
+withInterrupt m = send (WithInterrupt m)
+
 print :: Has Readline sig m => Doc AnsiStyle -> m ()
 print s = send (Print s)
 
@@ -55,4 +59,5 @@ data Readline (m :: Type -> Type) (k :: Type) where
   GetPassword :: Maybe Char -> String -> Readline m (Maybe String)
   WaitForAnyKey :: String -> Readline m Bool
   OutputStr :: String -> Readline m ()
+  WithInterrupt :: m a -> Readline m a
   Print :: Doc AnsiStyle -> Readline m ()
