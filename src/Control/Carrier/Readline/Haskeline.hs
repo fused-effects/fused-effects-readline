@@ -26,7 +26,7 @@ import Control.Monad.IO.Class (MonadIO(..))
 import Control.Monad.Trans.Class (MonadTrans(..))
 import Data.Text.Prettyprint.Doc
 import Data.Text.Prettyprint.Doc.Render.Terminal
-import System.Console.Haskeline
+import System.Console.Haskeline as H
 import System.Console.Terminal.Size as Size
 import System.Directory
 import System.Environment
@@ -73,9 +73,9 @@ instance (MonadIO m, MonadMask m) => Algebra Readline (ReadlineC m) where
 instance MonadException m => Algebra Readline (ReadlineC m) where
 #endif
   alg _ sig ctx = case sig of
-    Prompt prompt -> ReadlineC $ \ line -> do
-      str <- getInputLine @m prompt
-      pure (line + 1, ((line, str) <$ ctx))
+    GetInputLine prompt -> ReadlineC $ \ line -> do
+      str <- H.getInputLine @m prompt
+      pure (line + 1, (str <$ ctx))
     Print doc -> liftIO $ do
       opts <- layoutOptionsForTerminal
       (<$ ctx) <$> renderIO stdout (layoutSmart opts (doc <> line))

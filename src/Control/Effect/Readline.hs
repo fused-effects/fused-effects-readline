@@ -3,7 +3,7 @@
 module Control.Effect.Readline
 ( -- * Readline effect
   Readline(..)
-, prompt
+, getInputLine
 , print
   -- * Re-exports
 , Algebra
@@ -17,13 +17,13 @@ import Data.Text.Prettyprint.Doc (Doc)
 import Data.Text.Prettyprint.Doc.Render.Terminal (AnsiStyle)
 import Prelude hiding (print)
 
-prompt :: Has Readline sig m => String -> m (Int, Maybe String)
-prompt p = send (Prompt p)
+getInputLine :: Has Readline sig m => String -> m (Maybe String)
+getInputLine p = send (GetInputLine p)
 
 print :: Has Readline sig m => Doc AnsiStyle -> m ()
 print s = send (Print s)
 
 
 data Readline (m :: Type -> Type) (k :: Type) where
-  Prompt :: String -> Readline m (Int, Maybe String)
+  GetInputLine :: String -> Readline m (Maybe String)
   Print :: Doc AnsiStyle -> Readline m ()
