@@ -20,14 +20,10 @@ import Control.Monad.Catch (MonadMask(..))
 import Control.Monad.Fix (MonadFix)
 import Control.Monad.IO.Class (MonadIO(..))
 import Control.Monad.Trans.Class (MonadTrans(..))
-import Data.Text.Prettyprint.Doc
-import Data.Text.Prettyprint.Doc.Render.Terminal
 import System.Console.Haskeline as H
-import System.Console.Terminal.Size as Size
 import System.Directory
 import System.Environment
 import System.FilePath
-import System.IO (stdout)
 
 #if MIN_VERSION_haskeline(0, 8, 0)
 runReadline :: (MonadIO m, MonadMask m) => Prefs -> Settings m -> ReadlineC m a -> m a
@@ -73,11 +69,3 @@ instance MonadException m => Algebra Readline (ReadlineC m) where
     WaitForAnyKey prompt -> (<$ ctx) <$> ReadlineC (H.waitForAnyKey prompt)
     OutputStr s -> (<$ ctx) <$> ReadlineC (H.outputStr s)
     WithInterrupt m -> ReadlineC (H.withInterrupt (runReadlineC (hdl (m <$ ctx))))
-    Print doc -> liftIO $ (<$ ctx) <$> do
-      opts <- layoutOptionsForTerminal
-      renderIO stdout (layoutSmart opts (doc <> line))
-
-layoutOptionsForTerminal :: IO LayoutOptions
-layoutOptionsForTerminal = do
-  s <- maybe 80 Size.width <$> size
-  pure defaultLayoutOptions { layoutPageWidth = AvailablePerLine s 0.8 }

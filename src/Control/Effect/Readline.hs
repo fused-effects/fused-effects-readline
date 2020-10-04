@@ -10,7 +10,6 @@ module Control.Effect.Readline
 , outputStr
 , outputStrLn
 , withInterrupt
-, print
   -- * Re-exports
 , Algebra
 , Has
@@ -18,9 +17,6 @@ module Control.Effect.Readline
 ) where
 
 import Control.Algebra
-import Data.Text.Prettyprint.Doc (Doc)
-import Data.Text.Prettyprint.Doc.Render.Terminal (AnsiStyle)
-import Prelude hiding (print)
 
 getInputLine :: Has Readline sig m => String -> m (Maybe String)
 getInputLine p = send (GetInputLine p)
@@ -46,10 +42,6 @@ outputStrLn s = outputStr (s <> "\n")
 withInterrupt :: Has Readline sig m => m a -> m a
 withInterrupt m = send (WithInterrupt m)
 
-print :: Has Readline sig m => Doc AnsiStyle -> m ()
-print s = send (Print s)
-
-
 data Readline m k where
   GetInputLine :: String -> Readline m (Maybe String)
   GetInputLineWithInitial :: String -> (String, String) -> Readline m (Maybe String)
@@ -58,4 +50,3 @@ data Readline m k where
   WaitForAnyKey :: String -> Readline m Bool
   OutputStr :: String -> Readline m ()
   WithInterrupt :: m a -> Readline m a
-  Print :: Doc AnsiStyle -> Readline m ()
