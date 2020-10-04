@@ -8,7 +8,6 @@ module Control.Effect.Readline
 , getInputChar
 , getPassword
 , waitForAnyKey
-, askLine
 , print
   -- * Re-exports
 , Algebra
@@ -37,9 +36,6 @@ getPassword c s = send (GetPassword c s)
 waitForAnyKey :: Has Readline sig m => String -> m Bool
 waitForAnyKey p = send (WaitForAnyKey p)
 
-askLine :: Has Readline sig m => m Int
-askLine = send AskLine
-
 print :: Has Readline sig m => Doc AnsiStyle -> m ()
 print s = send (Print s)
 
@@ -50,5 +46,4 @@ data Readline (m :: Type -> Type) (k :: Type) where
   GetInputChar :: String -> Readline m (Maybe Char)
   GetPassword :: Maybe Char -> String -> Readline m (Maybe String)
   WaitForAnyKey :: String -> Readline m Bool
-  AskLine :: Readline m Int
   Print :: Doc AnsiStyle -> Readline m ()
