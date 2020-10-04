@@ -6,6 +6,8 @@
 
 - Defines a `getInputLineWithInitial` operation.
 
+- Defines a `getInputChar` operation.
+
 
 # v0.1.0.1
 
