@@ -1,3 +1,8 @@
+- Fixes an issue with the line number not being incremented.
+
+- Removes the styling applied to prompts; users can add styling to the prompt for themselves if so desired.
+
+
 # v0.1.0.1
 
 - Support for `prettyprinter` 1.7.
