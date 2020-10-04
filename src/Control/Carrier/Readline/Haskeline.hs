@@ -96,3 +96,6 @@ layoutOptionsForTerminal = do
 
 liftInputT :: Functor m => InputT m a -> ReadlineC m a
 liftInputT m = ReadlineC $ \ l -> (,) l <$> m
+
+incrLine :: Applicative m => ReadlineC m ()
+incrLine = ReadlineC $ \ line -> pure (line + 1, ())
