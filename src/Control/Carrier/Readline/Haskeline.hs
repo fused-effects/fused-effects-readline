@@ -15,6 +15,7 @@ module Control.Carrier.Readline.Haskeline
 import Control.Algebra
 import Control.Carrier.State.Strict
 import Control.Effect.Readline
+import Control.Monad (when)
 #if MIN_VERSION_haskeline(0, 8, 0)
 import Control.Monad.Catch (MonadMask(..))
 #endif
@@ -70,21 +71,13 @@ instance (MonadIO m, MonadMask m) => Algebra Readline (ReadlineC m) where
 instance MonadException m => Algebra Readline (ReadlineC m) where
 #endif
   alg _ sig ctx = case sig of
-    GetInputLine prompt -> ReadlineC $ \ line -> do
-      str <- H.getInputLine prompt
-      pure (line + 1, (str <$ ctx))
-    GetInputLineWithInitial prompt lr -> ReadlineC $ \ line -> do
-      str <- H.getInputLineWithInitial prompt lr
-      pure (line + 1, (str <$ ctx))
-    GetInputChar prompt -> ReadlineC $ \ line -> do
-      chr <- H.getInputChar prompt
-      pure (line + if chr == Just '\n' then 1 else 0, (chr <$ ctx))
-    GetPassword c prompt -> ReadlineC $ \ line -> do
-      str <- H.getPassword c prompt
-      pure (line + 1, (str <$ ctx))
-    WaitForAnyKey prompt -> ReadlineC $ \ line -> do
-      b <- H.waitForAnyKey prompt
-      pure (line, (b <$ ctx))
+    GetInputLine prompt -> (<$ ctx) <$> liftInputT (H.getInputLine prompt) <* incrLine
+    GetInputLineWithInitial prompt lr -> (<$ ctx) <$> liftInputT (H.getInputLineWithInitial prompt lr) <* incrLine
+    GetInputChar prompt -> (<$ ctx) <$> do
+      c <- liftInputT (H.getInputChar prompt)
+      c <$ when (c == Just '\n') incrLine
+    GetPassword c prompt -> (<$ ctx) <$> liftInputT (H.getPassword c prompt) <* incrLine
+    WaitForAnyKey prompt -> (<$ ctx) <$> liftInputT (H.waitForAnyKey prompt)
     Print doc -> liftIO $ do
       opts <- layoutOptionsForTerminal
       (<$ ctx) <$> renderIO stdout (layoutSmart opts (doc <> line))
