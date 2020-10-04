@@ -2,6 +2,8 @@
 
 - Removes the styling applied to prompts; users can add styling to the prompt for themselves if so desired.
 
+- Renames `prompt` to `getInputLine`, matching `haskeline`’s naming.
+
 
 # v0.1.0.1
 
