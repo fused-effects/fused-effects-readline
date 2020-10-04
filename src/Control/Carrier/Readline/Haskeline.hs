@@ -79,7 +79,7 @@ instance MonadException m => Algebra Readline (ReadlineC m) where
     Print doc -> do
       s <- maybe 80 Size.width <$> liftIO size
       let docstream = layoutSmart (layoutOptions s) (doc <> line)
-      (<$ ctx) <$> (liftIO . renderIO stdout $ docstream)
+      (<$ ctx) <$> liftIO (renderIO stdout docstream)
     where
     cyan = "\ESC[1;36m\STX"
     plain = "\ESC[0m\STX"
