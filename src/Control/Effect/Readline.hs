@@ -9,6 +9,7 @@ module Control.Effect.Readline
 , getPassword
 , waitForAnyKey
 , outputStr
+, outputStrLn
 , print
   -- * Re-exports
 , Algebra
@@ -39,6 +40,9 @@ waitForAnyKey p = send (WaitForAnyKey p)
 
 outputStr :: Has Readline sig m => String -> m ()
 outputStr s = send (OutputStr s)
+
+outputStrLn :: Has Readline sig m => String -> m ()
+outputStrLn s = outputStr (s <> "\n")
 
 print :: Has Readline sig m => Doc AnsiStyle -> m ()
 print s = send (Print s)
