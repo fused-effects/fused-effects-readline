@@ -15,7 +15,6 @@ module Control.Carrier.Readline.Haskeline
 ) where
 
 import Control.Algebra
-import Control.Carrier.Lift
 import Control.Carrier.State.Strict
 import Control.Effect.Readline
 #if MIN_VERSION_haskeline(0, 8, 0)
@@ -62,7 +61,7 @@ runReadlineWithHistory block = do
   runReadline prefs settings block
 
 newtype ReadlineC m a = ReadlineC (Int -> InputT m (Int, a))
-  deriving (Applicative, Functor, Monad, MonadFix, MonadIO) via StateC Int (LiftC (InputT m))
+  deriving (Applicative, Functor, Monad, MonadFix, MonadIO) via StateC Int (InputT m)
 
 instance MonadTrans ReadlineC where
   lift m = ReadlineC $ \ l -> (,) l <$> lift m
