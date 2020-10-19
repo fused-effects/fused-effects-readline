@@ -1,7 +1,10 @@
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
 module Control.Carrier.Readline.Haskeline
 ( -- * Readline carrier
@@ -56,6 +59,20 @@ runReadlineWithHistory block = do
 newtype ReadlineC m a = ReadlineC { runReadlineC :: InputT m a }
   deriving (Applicative, Functor, Monad, MonadFix, MonadIO, MonadTrans)
 
+#if MIN_VERSION_haskeline(0, 8, 1)
+instance (Algebra sig m, MonadIO m, MonadMask m) => Algebra (Readline :+: sig) (ReadlineC m) where
+  alg hdl sig ctx = case sig of
+    L readline -> case readline of
+      GetInputLine prompt -> (<$ ctx) <$> ReadlineC (H.getInputLine prompt)
+      GetInputLineWithInitial prompt lr -> (<$ ctx) <$> ReadlineC (H.getInputLineWithInitial prompt lr)
+      GetInputChar prompt -> (<$ ctx) <$> ReadlineC (H.getInputChar prompt)
+      GetPassword c prompt -> (<$ ctx) <$> ReadlineC (H.getPassword c prompt)
+      WaitForAnyKey prompt -> (<$ ctx) <$> ReadlineC (H.waitForAnyKey prompt)
+      OutputStr s -> (<$ ctx) <$> ReadlineC (H.outputStr s)
+      WithInterrupt m -> ReadlineC (H.withInterrupt (runReadlineC (hdl (m <$ ctx))))
+      HandleInterrupt h m -> ReadlineC (H.handleInterrupt (runReadlineC (hdl (h <$ ctx))) (runReadlineC (hdl (m <$ ctx))))
+    R other -> ReadlineC $ H.withRunInBase $ \ run -> alg (run . runReadlineC . hdl) other ctx
+#else
 #if MIN_VERSION_haskeline(0, 8, 0)
 instance (MonadIO m, MonadMask m) => Algebra Readline (ReadlineC m) where
 #else
@@ -70,3 +87,4 @@ instance MonadException m => Algebra Readline (ReadlineC m) where
     OutputStr s -> (<$ ctx) <$> ReadlineC (H.outputStr s)
     WithInterrupt m -> ReadlineC (H.withInterrupt (runReadlineC (hdl (m <$ ctx))))
     HandleInterrupt h m -> ReadlineC (H.handleInterrupt (runReadlineC (hdl (h <$ ctx))) (runReadlineC (hdl (m <$ ctx))))
+#endif
