@@ -8,6 +8,8 @@
 
 - Defines `getInputLineWithInitial`, `getInputChar`, `getPassword`, etc. operations matching `haskeline`’s API.
 
+- Allows other effects to be lifted through `ReadlineC` on `haskeline` 0.8.1 or later. ([#3](https://github.com/fused-effects/fused-effects-readline/issues/3))
+
 
 # v0.1.0.1
 
