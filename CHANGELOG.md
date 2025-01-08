@@ -1,3 +1,7 @@
+# v0.2.0.0
+
+- Removes `prettyprinter` dependency.
+
 - Removes the styling applied to prompts; users can add styling to the prompt for themselves if so desired.
 
 - Removes line number tracking.
